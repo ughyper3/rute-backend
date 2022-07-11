@@ -54,15 +54,6 @@ class BaseModel(models.Model):
         self.save()
 
 
-class Car(BaseModel):
-    maker = models.CharField(max_length=32, null=False, blank=False)
-    color = models.CharField(max_length=32, null=False, blank=False)
-    license_plate = models.CharField(max_length=32, null=False, blank=False)
-
-    def __str__(self):
-        return f"{self.license_plate}"
-
-
 class User(AbstractBaseUser, BaseModel):
     email = models.EmailField(verbose_name='email', max_length=128, unique=True, null=False, blank=False)
     password = models.CharField(max_length=256, null=False, blank=False)
@@ -79,8 +70,6 @@ class User(AbstractBaseUser, BaseModel):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 
-    car = models.ManyToManyField(Car, blank=True)
-
     objects = MyUserManager()
 
     USERNAME_FIELD = 'email'
@@ -95,6 +84,17 @@ class User(AbstractBaseUser, BaseModel):
         return f"{self.first_name}-{self.last_name}-{self.uuid}"
 
 
+class Car(BaseModel):
+    maker = models.CharField(max_length=32, null=False, blank=False)
+    color = models.CharField(max_length=32, null=False, blank=False)
+    license_plate = models.CharField(max_length=32, null=False, blank=False)
+
+    owner = models.ForeignKey(User, related_name="car_owner", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.license_plate}"
+
+
 class Route(BaseModel):
     starting_location = models.CharField(max_length=256, null=False, blank=False)
     end_location = models.CharField(max_length=256, null=False, blank=False)
@@ -105,8 +105,23 @@ class Route(BaseModel):
     passenger = models.ManyToManyField(User, related_name="passenger")
     car = models.ForeignKey(Car, on_delete=models.CASCADE, related_name="car")
 
+    is_canceled = models.BooleanField(default=False, null=False, blank=False)
+    is_checkin = models.BooleanField(default=False, null=False, blank=False)
+    is_checkout = models.BooleanField(default=False, null=False, blank=False)
+
     def __str__(self):
         return f"{self.car}-{self.starting_location}-{self.end_location}"
+
+
+class DriveRequest(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="passenger_request")
+    route = models.ForeignKey(Route, on_delete=models.CASCADE, related_name="route_requested")
+
+    is_canceled = models.BooleanField(default=False, blank=False, null=False)
+    is_accepted = models.BooleanField(null=True, default=None)  # None = no answer, True = accepted, False = Declined
+
+    def __str__(self):
+        return f"{self.uuid}"
 
 
 class CheckIn(BaseModel):

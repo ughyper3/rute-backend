@@ -1,5 +1,5 @@
 from django.contrib import admin
-from rute_api.models import User, Car, Route, CheckIn
+from rute_api.models import User, Car, Route, CheckIn, DriveRequest
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -39,7 +39,17 @@ class CheckInAdmin(admin.ModelAdmin):
     ]
 
 
+class DriveRequestAdmin(admin.ModelAdmin):
+    list_display = [
+        "user",
+        "route",
+        "is_accepted",
+        "is_canceled"
+    ]
+
+
 admin.site.register(User, UserAdmin)
 admin.site.register(Car, CarAdmin)
 admin.site.register(Route, RouteAdmin)
 admin.site.register(CheckIn, CheckInAdmin)
+admin.site.register(DriveRequest, DriveRequestAdmin)
