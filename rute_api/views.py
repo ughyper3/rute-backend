@@ -27,5 +27,5 @@ class DriveRequestView(APIView):
 
     def get(self, request, format=None, *args, **kwargs):
         driver_uuid = self.kwargs['driver_uuid']
-        drive_requests = get_drive_request_by_user(driver_uuid)
+        drive_requests = get_drive_request_by_user(driver_uuid).values()
         return Response(drive_requests, status=status.HTTP_200_OK)

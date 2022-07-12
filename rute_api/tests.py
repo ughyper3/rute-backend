@@ -1,3 +1,60 @@
 from django.test import TestCase
+from rute_api.models import User, DriveRequest, Car, Route
+from datetime import datetime
 
-# Create your tests here.
+from rute_api.queries import get_drive_request_by_user
+
+
+class DriveRequestViewTest(TestCase):
+
+    def setUp(self):
+        self.driver = User.objects.create(
+            email="test@teste.com",
+            password="testtesttest",
+            rating=0.0
+        )
+        self.passenger = User.objects.create(
+            email="test@tese.com",
+            password="testtesttest",
+            rating=0.0
+        )
+        self.car = Car.objects.create(
+            maker="test",
+            color="test",
+            license_plate="test",
+            owner=self.driver
+        )
+        self.route = Route.objects.create(
+            starting_location="test",
+            end_location="test",
+            starting_time=datetime.now(),
+            available_seats=2,
+            car=self.car
+        )
+        self.drive_request1 = DriveRequest.objects.create(
+            user=self.passenger,
+            route=self.route
+        )
+        self.drive_request2 = DriveRequest.objects.create(
+            user=self.passenger,
+            route=self.route,
+            deleted=True
+        )
+        self.drive_request3 = DriveRequest.objects.create(
+            user=self.passenger,
+            route=self.route,
+            is_canceled=True
+        )
+        self.drive_request4 = DriveRequest.objects.create(
+            user=self.passenger,
+            route=self.route,
+            is_accepted=True
+        )
+
+    def test_get_drive_request_by_user(self):
+        response = get_drive_request_by_user(self.driver.uuid)
+        self.assertEqual(len(response), 1)
+        self.assertEqual(response[0], self.drive_request1)
+
+
+
