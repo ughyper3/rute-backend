@@ -1,6 +1,8 @@
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
+from rute_api.algorithm import create_checkin
 from rute_api.models import User, Route, DriveRequest
 from rute_api.queries import get_drive_request_by_user
 from rute_api.serializers import UserSerializer, RouteSerializer, DriveRequestSerializer
@@ -42,6 +44,7 @@ class DriveRequestView(APIView):
         serializer = DriveRequestSerializer(drive_request_uuid, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            create_checkin(serializer)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

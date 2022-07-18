@@ -125,10 +125,19 @@ class DriveRequest(BaseModel):
 
 
 class CheckIn(BaseModel):
+
+    STATUS = (
+        (1, "waiting"),
+        (2, "validated"),
+        (3, "canceled")
+    )
+
     checkin_time = models.DateTimeField(null=False, blank=False)
 
     route = models.ForeignKey(Route, on_delete=models.CASCADE, related_name="route")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="checkin_user")
+
+    status = models.CharField(choices=STATUS, max_length=64, default=1)
 
     def __str__(self):
         return f"{self.checkin_time}-{self.route}"
