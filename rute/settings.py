@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'rute_api.apps.RuteApiConfig'
+    'rute_api.apps.RuteApiConfig',
+    'rest_auth'
 ]
 
 MIDDLEWARE = [
